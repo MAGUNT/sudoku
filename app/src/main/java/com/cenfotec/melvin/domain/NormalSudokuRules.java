@@ -1,173 +1,152 @@
 
 package com.cenfotec.melvin.domain;
 
-import android.util.Log;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  *
  * @author melvin
  */
-public class NormalSudokuRules implements SudokuRules {
+public enum NormalSudokuRules implements SudokuRules {
+
+    INSTANCE;
+
+    private final int ROW_COL_SIZE      = 9;
+    private final int NUMBER_OF_SQUARES = ROW_COL_SIZE * ROW_COL_SIZE;
+
+    private final List<Integer>            squares;
+    private final List<Set<Integer>>       unitList;
+    private final List<List<Set<Integer>>> unitTable;
+    private final List<Set<Integer>>       peerTable;
 
 
-    private final static String[] ROW_SECTORS   = {"123", "456", "789"};
-    private final static String[] COL_SECTORS   = {"ABC", "DEF", "GHI"};
-    private final static String ROWS     = "123456789";
-    private final static String COLS     = "ABCDEFGHI";
-    private final static int CELLS_COUNT = ROWS.length() * COLS.length();
+    NormalSudokuRules() {
+        squares   = IntStream
+                .range(0, NUMBER_OF_SQUARES)
+                .boxed()
+                .collect(Collectors.toList());
 
-    private final static String DIGITS  = "123456789";
-
-
-    private final List<String> squares;
-    private final List<Set<String>> unitList;
-    private final Map<String, List<Set<String>>> unitTable;
-    private final Map<String, Set<String>> peerTable;
-
-    private static NormalSudokuRules instance = new  NormalSudokuRules();
-
-    public static NormalSudokuRules getInstance() { return instance; }
-
-
-    public NormalSudokuRules() {
-        this.squares   = crossList(ROWS, COLS);
-        this.unitList  = initUnitList(ROWS, COLS);
-        this.unitTable = createUnitTable(squares, unitList);
-        this.peerTable = createPeerTable(unitTable, squares);
+        unitList  = createUnits();
+        unitTable = unitTable(squares, unitList);
+        peerTable = peers(squares, unitTable);
 
     }
 
-    private void cross(Collection<String> col, String s, String r) {
-        for(int i = 0; i <  s.length(); ++i) {
-            for(int j = 0; j <  r.length(); ++j) {
-                col.add("" + s.charAt(i) + r.charAt(j));
-            }
-        }
+
+    @Override
+    public Stream<IntStream> getUnits(int integer) {
+        return  unitTable.get(integer).stream()
+                .map( s -> s.stream().mapToInt(Integer::intValue));
     }
 
-    private List<String> crossList(String s, String r) {
-        List<String> list = new ArrayList<>();
-        cross(list, s, r);
-        return Collections.unmodifiableList(list);
-    }
 
-    private Set<String> cross(String s, String r) {
-        Set<String> set = new HashSet<>();
-        cross(set, s, r);
-        return Collections.unmodifiableSet(set);
-    }
+    @Override
+    public IntStream getPeers(int integer) {
+        return peerTable.get(integer).stream()
+                .mapToInt(Integer::intValue);
 
-    private List<Set<String>> initUnitList(final String rows, final String cols) {
-        List<Set<String>> initUnitList = new ArrayList<>();
-        for (int i = 0; i <  cols.length(); ++i) {
-            initUnitList.add(cross(rows, String.valueOf(cols.charAt(i))));
-        }
-        for (int i = 0; i <  rows.length(); ++i) {
-            initUnitList.add(cross(String.valueOf(rows.charAt(i)), cols));
-        }
-        for (String rowSquare: ROW_SECTORS) {
-            for (String colsSquare: COL_SECTORS) {
-                initUnitList.add(cross(rowSquare, colsSquare ));
-            }
-        }
-        return Collections.unmodifiableList(initUnitList);
-    }
-
-    private Map<String, List<Set<String>>> createUnitTable(
-            List<String> squares,
-            List<Set<String>> unitList) {
-
-        Map<String, List<Set<String>>> initUnitTable = new HashMap<>();
-        for (String square: squares) {
-            List<Set<String>> list = new ArrayList<>();
-            for (Set<String> u : unitList) {
-                if(u.contains(square)) {
-                    list.add(u);
-                }
-            }
-
-            initUnitTable.put(square,
-                    Collections.unmodifiableList(list));
-        }
-        return initUnitTable;
-    }
-
-    private Map<String, Set<String>> createPeerTable(
-            final Map<String, List<Set<String>>> unitTable,
-            final List<String> squares) {
-
-        Map<String, Set<String>> initPeerTable = new HashMap<>();
-        for (String square: squares) {
-            Set<String> peers = new HashSet<>();
-            for(Set<String> unit: unitTable.get(square)) {
-                peers.addAll(unit);
-            }
-            peers.remove(square);
-            initPeerTable.put(square,
-                    Collections.unmodifiableSet(peers));
-
-        }
-        return initPeerTable;
     }
 
     @Override
-    public List<String> getSquares() {
-        return squares;
+    public IntStream getSquares() {
+        return IntStream.range(0, NUMBER_OF_SQUARES);
+    }
+
+    private List<Set<Integer>> createUnits() {
+        Stream<IntStream> cols = rowsCols()
+                .mapToObj(i -> cross(rowsCols(), IntStream.of(i)));
+        Stream<IntStream> rows = rowsCols()
+                .mapToObj(i -> cross(IntStream.of(i), rowsCols()));
+
+        List<List<Integer>> sectorList = unitSectors();
+        Stream<IntStream> sectors = sectorList
+                .stream()
+                .flatMap(r -> sectorList.stream()
+                        .map( r2 -> cross(intStream(r), intStream(r2))));
+
+        return Stream.concat(sectors, Stream.concat(cols, rows))
+                .map(unit -> unit.boxed()
+                        .collect(Collectors.toSet()))
+                .collect(Collectors.toList());
+    }
+
+    private List<List<Integer>> unitSectors() {
+        return Arrays.asList(
+                toList(IntStream.range(0, 3)),
+                toList(IntStream.range(3, 6)),
+                toList(IntStream.range(6, ROW_COL_SIZE)));
+    }
+
+    private List<Integer> toList(IntStream stream) {
+        return stream.boxed().collect(Collectors.toList());
+    }
+
+    private IntStream intStream(List<Integer> s) {
+        return s.stream().mapToInt(i -> i);
+    }
+
+    private List<List<Set<Integer>>> unitTable(
+            List<Integer> squares,
+            List<Set<Integer>> units) {
+        return squares.stream()
+                .map(i -> units.stream()
+                        .filter(u -> u.contains(i))
+                        .collect(Collectors.toList()))
+                .collect(Collectors.toList());
+    }
+
+    private List<Set<Integer>> peers(
+            List<Integer> squares,
+            List<List<Set<Integer>>> unitTable) {
+        return squares.stream()
+                .map(i -> unitTable.get(i)
+                        .stream()
+                        .flatMap(Set::stream)
+                        .filter(s -> !s.equals(i))
+                        .collect(Collectors.toSet()))
+                .map(Collections::unmodifiableSet)
+                .collect(Collectors.toList());
+    }
+
+    private  IntStream cross(IntStream rows, IntStream cols) {
+        List<Integer> list = cols
+                .boxed()
+                .collect(Collectors.toList());
+        return rows
+                .flatMap(r -> list
+                        .stream()
+                        .mapToInt(c -> calculatePos(r, c)));
+    }
+
+    private int calculatePos(final int row, final int col) {
+        return row * ROW_COL_SIZE + col;
+    }
+
+    private IntStream rowsCols() {
+        return IntStream.range(0, ROW_COL_SIZE);
     }
 
     @Override
-    public List<Set<String>> getUnitList() {
-        return unitList;
+    public Stream<IntStream> getUnitList() {
+        return unitList.stream()
+                .map( s -> s.stream().mapToInt(Integer::intValue));
+    }
+
+
+    @Override
+    public EnumSet<SudokuDigits> getDigits() {
+        return EnumSet.range(SudokuDigits.ONE, SudokuDigits.NINE);
     }
 
     @Override
-    public List<Set<String>> getUnits(final String square) {
-        return unitTable.get(square);
+    public int squaresSize() {
+        return NUMBER_OF_SQUARES;
     }
-
-    @Override
-    public Set<String> getPeers(final String square) {
-        return peerTable.get(square);
-    }
-
-    @Override
-    public String getDigits() {
-        return DIGITS;
-    }
-
-    @Override
-    public Map<String, String> createPosibilityTable() {
-        Map<String, String> table = new HashMap<>();
-        for(String sq : squares) {
-            table.put(sq, DIGITS);
-        }
-        return table;
-    }
-
-    public String squareFromNumber(final int pos) {
-        if(pos < 0  && pos > CELLS_COUNT) {
-            throw new IllegalArgumentException("Invalid position");
-        }
-        return  "" + ROWS.charAt(pos / COLS.length())
-                + COLS.charAt(pos % ROWS.length());
-    }
-
-
-    public int numberFromSquare(final String pos) {
-        if(pos.length() != 2) {
-            throw new IllegalArgumentException("Invalid position");
-        }
-        return  ((pos.charAt(0) - ROWS.charAt(0)) * COLS.length())
-                + (pos.charAt(1) - COLS.charAt(0));
-    }
-
 }

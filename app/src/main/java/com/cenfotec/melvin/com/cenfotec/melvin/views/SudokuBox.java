@@ -12,6 +12,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 
 import com.cenfotec.melvin.sudoku.R;
@@ -24,23 +25,20 @@ public class SudokuBox extends AppCompatEditText {
     private static final int ANIMATION_DURATION = 500;
     private static final int COLUMNS = 9;
 
-    private final ValueAnimator animator;
+    private ValueAnimator animator;
+    private final Context context;
 
-    public SudokuBox(Context context, int pos) {
+    public SudokuBox(Context context) {
         super(context);
-
-        final int color = calculateBackGroundColor(context, pos);
-        final int invalidColor = ContextCompat.getColor(context, R.color.colorPrimary);
-        animator = animateEditText(this, color, invalidColor);
-
-        this.setIncludeFontPadding(false);
-        setBackgroundColor(color);
+        this.context = context;
+        setIncludeFontPadding(false);
         setGravity(Gravity.CENTER_HORIZONTAL
                 | Gravity.CENTER_VERTICAL);
 
         setInputType(InputType.TYPE_CLASS_NUMBER
-                | InputType.TYPE_NUMBER_VARIATION_PASSWORD );
-
+                | InputType.TYPE_NUMBER_VARIATION_PASSWORD
+                | InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS );
+        setImeOptions(EditorInfo.IME_FLAG_NO_EXTRACT_UI);
         initTextStyles(context);
     }
 
@@ -48,7 +46,7 @@ public class SudokuBox extends AppCompatEditText {
         setFilters(new InputFilter[]{ new InputFilter.LengthFilter(1) });
         setTransformationMethod(new NumericKeyBoardTransformationMethod());
         changeCursorColor();
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
         setTextColor(ContextCompat.getColor(context, R.color.white));
     }
 
@@ -70,6 +68,13 @@ public class SudokuBox extends AppCompatEditText {
         } catch (IllegalAccessException e) { }
     }
 
+    public void setPosition(int pos) {
+        final int color = calculateBackGroundColor(context, pos);
+        final int invalidColor = ContextCompat.getColor(context, R.color.colorPrimary);
+        animator = animateEditText(this, color, invalidColor);
+        setBackgroundColor(color);
+    }
+
     private ValueAnimator animateEditText(final TextView editText,
                                           final int tileColor,
                                           final int invalidColor) {
@@ -78,13 +83,7 @@ public class SudokuBox extends AppCompatEditText {
                 .ofArgb(tileColor, invalidColor);
         colorAnimation.setDuration(ANIMATION_DURATION);
         colorAnimation.addUpdateListener(
-                new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animator) {
-                editText.setBackgroundColor((int) animator.getAnimatedValue());
-            }
-
-        });
+                animator -> editText.setBackgroundColor((int) animator.getAnimatedValue()));
         colorAnimation.setRepeatMode(ValueAnimator.REVERSE);
         colorAnimation.setRepeatCount(1);
         return colorAnimation;

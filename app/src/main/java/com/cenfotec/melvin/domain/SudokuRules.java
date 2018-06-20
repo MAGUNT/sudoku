@@ -1,16 +1,18 @@
 package com.cenfotec.melvin.domain;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
+/** Mejorar esta interfaze para no tener que exponer el estado*/
 public interface SudokuRules {
-    List<String> getSquares();
-    List<Set<String>> getUnitList();
-    List<Set<String>> getUnits(final String square);
-    Set<String> getPeers(final String square);
-    Map<String, String> createPosibilityTable();
-    String getDigits();
-    public String squareFromNumber(final int pos);
-    public int numberFromSquare(final String pos);
+    IntStream getSquares();
+    Stream<IntStream> getUnitList();
+    Stream<IntStream> getUnits(final int square);
+    IntStream getPeers(final int square);
+    EnumSet<SudokuDigits> getDigits();
+    int squaresSize();
 }

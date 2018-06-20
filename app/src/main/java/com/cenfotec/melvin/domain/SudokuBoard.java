@@ -3,69 +3,56 @@ package com.cenfotec.melvin.domain;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
-
+//re implementar con enum set
 public class SudokuBoard {
 
-    private final char EMPTY = '.';
-    private final Map<String, Character> board;
-    private final SudokuRules util;
+    private final List<SudokuDigits> board;
+    private final SudokuRules rules;
 
     public SudokuBoard() {
-        this.util  = NormalSudokuRules.getInstance();
-       this.board = createBoard(this.util);
+        this.rules  = NormalSudokuRules.INSTANCE;
+       this.board = createBoard(this.rules);
     }
 
-    private Map<String, Character> createBoard(SudokuRules util) {
-        Map<String, Character> board = new HashMap<>();
-        for(String square: util.getSquares()) {
-            board.put(square, EMPTY);
-        }
-        return board;
+    private List<SudokuDigits> createBoard(SudokuRules util) {
+       return Stream.iterate(SudokuDigits.EMPTY, s -> s)
+                .limit(rules.squaresSize())
+                .collect(Collectors.toList());
     }
 
-    public List<Integer> add(int position, Character value) {
-        String mapPos = util.squareFromNumber(position);
-        List<Integer> list  = isValid(mapPos, value);
-        if(list.isEmpty()) {
-            board.put(mapPos, value);
+    public List<Integer> add(int position, String value) {
+        SudokuDigits digit = SudokuDigits.fromText(value);
+        List<Integer> list  = getInvalid(position, digit);
+        if(digit == SudokuDigits.EMPTY || list.isEmpty()) {
+            board.set(position, digit);
         }
         return list;
     }
 
-    public void remove(int position) {
-        String mapPos = util.squareFromNumber(position);
-        board.put(mapPos, EMPTY);
+    private List<Integer> getInvalid(final int position, final SudokuDigits digit) {
+        return rules.getPeers(position)
+                .filter(s -> digit != SudokuDigits.EMPTY)
+                .filter(s -> board.get(s) == digit)
+                .boxed()
+                .collect(Collectors.toList());
+
     }
 
-    private List<Integer> isValid(String position, final Character value) {
-        List<Integer> invalid = new ArrayList();
-        for(String pos : util.getPeers(position)) {
-            if(board.get(pos) == value) {
-                invalid.add(util.numberFromSquare(pos));
-            }
-        }
-        return invalid;
+    public String getValue(int position) {
+        return board.get(position).getSudokuText();
     }
 
-    public Map<Integer, String> solve() {
-       Map<String, String> solved = new SudokuSolver(util, board).solve();
-       Map<Integer, String> maped = new Hashtable<>();
-       for(Map.Entry<String, String> e : solved.entrySet()) {
-           maped.put(util.numberFromSquare(e.getKey()), e.getValue());
-       }
-       return maped;
-    }
-
-    public String toStringPos(int pos) {
-        return util.squareFromNumber(pos);
-    }
-    public int cellCount() {
-        return util.getSquares().size();
+    public int size() {
+        return board.size();
     }
 
 }
