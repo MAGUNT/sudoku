@@ -1,10 +1,12 @@
 package com.cenfotec.melvin.domain;
 
+import android.support.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -14,13 +16,19 @@ public class SudokuSolver {
     private final SudokuRules rules;
     private final List<EnumSet<SudokuDigits>> table;
 
-    public SudokuSolver(SudokuRules rules, String grid) {
+    public SudokuSolver(SudokuRules rules, @NonNull String grid) {
         this(rules, parseGrid(grid, rules));
     }
 
-    public SudokuSolver(SudokuRules rules, List<SudokuDigits> grid) {
+    public SudokuSolver(@NonNull SudokuRules rules,
+                        @NonNull List<SudokuDigits> grid) {
         this.rules = rules;
         this.table = propagateConstrains(grid);
+    }
+
+    public SudokuSolver(@NonNull SudokuRules rules) {
+        this.rules = rules;
+        this.table = createPosibilityTable();
     }
 
     List<EnumSet<SudokuDigits>> createPosibilityTable() {
@@ -49,10 +57,8 @@ public class SudokuSolver {
                 .allMatch(i -> grid.get(i) == SudokuDigits.EMPTY
                         || set(tableValues, i, grid.get(i)) != null);
 
-        if (!isValid) {
-            throw new IllegalArgumentException();
-        }
-        return tableValues;
+
+        return isValid ? tableValues : null;
     }
 
     private List<EnumSet<SudokuDigits>> set(

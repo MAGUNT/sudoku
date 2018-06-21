@@ -68,11 +68,27 @@ public class SudokuBox extends AppCompatEditText {
         } catch (IllegalAccessException e) { }
     }
 
-    public void setPosition(int pos) {
-        final int color = calculateBackGroundColor(context, pos);
+    public void update(int pos, boolean isEnable) {
+        int color = calculateBackGroundColor(context, pos);
+        if(!isEnable) {
+            color = manipulateColor(color, 1.15f);
+        }
         final int invalidColor = ContextCompat.getColor(context, R.color.colorPrimary);
         animator = animateEditText(this, color, invalidColor);
         setBackgroundColor(color);
+        setEnabled(isEnable);
+    }
+
+    public static int manipulateColor(int color, float factor) {
+        final int max = 255;
+        int a = Color.alpha(color);
+        int r = Math.round(Color.red(color) * factor);
+        int g = Math.round(Color.green(color) * factor);
+        int b = Math.round(Color.blue(color) * factor);
+        return Color.argb(a,
+                Math.min(r, max),
+                Math.min(g, max),
+                Math.min(b, max));
     }
 
     private ValueAnimator animateEditText(final TextView editText,

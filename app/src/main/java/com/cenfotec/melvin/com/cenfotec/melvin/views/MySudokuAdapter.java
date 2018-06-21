@@ -1,7 +1,6 @@
 package com.cenfotec.melvin.com.cenfotec.melvin.views;
 
 
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -37,7 +36,7 @@ public class MySudokuAdapter extends RecyclerView.Adapter<MySudokuAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.myCustomSudokuBoxListener.updatePosition(position);
         holder.mEditText.setText(sudokuBoard.getValue(position));
-        holder.mEditText.setPosition(position);
+        holder.mEditText.update(position, sudokuBoard.isEnable(position));
     }
 
     @Override
@@ -80,7 +79,8 @@ public class MySudokuAdapter extends RecyclerView.Adapter<MySudokuAdapter.ViewHo
         public void afterTextChanged(Editable editable) {
             String text = editable.toString();
             SudokuBox sudokuBox = getSudokuBox(position);
-            if(sudokuBox == null) {
+            if(sudokuBox == null
+                    || sudokuBoard.getValue(position).equals(text)) {
                 return;
             }
             List<Integer> invalid = sudokuBoard

@@ -1,5 +1,7 @@
 package com.cenfotec.melvin.domain;
 
+import android.support.annotation.NonNull;
+
 public enum SudokuDigits {
     ONE("1"),
     TWO("2"),
@@ -23,7 +25,7 @@ public enum SudokuDigits {
         return sudokuText;
     }
 
-    public static SudokuDigits fromText(final String text) {
+    public static SudokuDigits fromText(@NonNull final String text) {
         if (text.isEmpty() || text.length() > 1) {
             return EMPTY;
         }
