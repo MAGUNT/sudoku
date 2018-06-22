@@ -10,7 +10,7 @@ import java.util.stream.IntStream;
 
 public class ManySolutionsSudokuGenerator implements SudokuGenerator{
 
-    private static final int MIN_SIZE = 54 ;
+    private static final int MIN_SIZE = 30;
     private static final int MAX_SIZE = 64;
     private final SudokuSolver solver;
     private final List<Integer> positions;
