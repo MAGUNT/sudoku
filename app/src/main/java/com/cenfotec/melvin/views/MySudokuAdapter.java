@@ -1,4 +1,4 @@
-package com.cenfotec.melvin.com.cenfotec.melvin.views;
+package com.cenfotec.melvin.views;
 
 
 import android.support.v7.widget.RecyclerView;
@@ -7,7 +7,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.cenfotec.melvin.domain.SudokuBoard;
+import com.cenfotec.melvin.bll.SudokuBoard;
 
 import java.util.List;
 

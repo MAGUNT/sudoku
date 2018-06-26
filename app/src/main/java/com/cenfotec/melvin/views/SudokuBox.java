@@ -1,4 +1,4 @@
-package com.cenfotec.melvin.com.cenfotec.melvin.views;
+package com.cenfotec.melvin.views;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ValueAnimator;

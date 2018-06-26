@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "992456903699",
+    "firebase_url": "https://sudoku-3018d.firebaseio.com",
+    "project_id": "sudoku-3018d",
+    "storage_bucket": "sudoku-3018d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:992456903699:android:b359ab7e0b4a1806",
+        "android_client_info": {
+          "package_name": "com.cenfotec.melvin.sudoku"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "992456903699-jgmdrr94ubgfqrc0s4nadbmtkb48gcft.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cenfotec.melvin.sudoku",
+            "certificate_hash": "f89f706011c86d08c5889acdfbc05e4e6e4d2e26"
+          }
+        },
+        {
+          "client_id": "992456903699-ei114di6o6s0g35rtj0pl0mvb4dhm7l0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtPeJmppksYomIkTYaMibEPVmwvEkjbdg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "992456903699-ei114di6o6s0g35rtj0pl0mvb4dhm7l0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
