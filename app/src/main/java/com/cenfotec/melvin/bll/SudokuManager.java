@@ -40,4 +40,10 @@ public class SudokuManager {
         return null;
     }
 
+
+    public static Task<SudokuEntity> getSudokuById(String id) {
+        return SudokuRepo.getSudoku(id)
+                .continueWith(SudokuManager::toSudokuEnitity);
+    }
+
 }

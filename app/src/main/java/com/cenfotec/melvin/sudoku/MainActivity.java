@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         SudokuManager.generateSudoku()
                 .addOnSuccessListener(this, sudoku -> {
                     Intent intent = new Intent(this, Sudoku.class);
-                    intent.putExtra(SUDOKU, sudoku);
+                    intent.putExtra(SUDOKU, sudoku.getId());
                     this.startActivity(intent);
                 });
     }

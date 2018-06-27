@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.cenfotec.melvin.bll.SudokuManager;
 import com.cenfotec.melvin.views.ItemOffsetDecoration;
 import com.cenfotec.melvin.views.MySudokuAdapter;
 import com.cenfotec.melvin.bll.SudokuBoard;
@@ -34,13 +35,10 @@ public class Sudoku extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 
-
-        this.sudokuBoard = initBoard();
-        mAdapter = new MySudokuAdapter(sudokuBoard, mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
-
         ItemOffsetDecoration itemDecoration = new ItemOffsetDecoration(this, R.dimen.item_offset);
         mRecyclerView.addItemDecoration(itemDecoration);
+        initBoard();
+
     }
 
     @Override
@@ -49,16 +47,17 @@ public class Sudoku extends AppCompatActivity {
     }
 
 
-    private SudokuBoard initBoard() {
+    private void initBoard() {
 
-        SudokuEntity entity = (SudokuEntity)
+        String id = (String)
                 getIntent().getSerializableExtra(SUDOKU);
-
-        sudokuBoard = SudokuBoard.createBoard(en
-                tity.getSudokuBoard());
-        //agregar timepo y move count.
-
-        return sudokuBoard;
+        SudokuManager.getSudokuById(id)
+                .addOnCompleteListener(sudokuBoard -> {
+                    SudokuEntity entity =  sudokuBoard.getResult();
+                    this.sudokuBoard = SudokuBoard.createBoard(entity.getSudokuBoard());
+                    mAdapter = new MySudokuAdapter(this.sudokuBoard, mLayoutManager);
+                    mRecyclerView.setAdapter(mAdapter);
+                });
     }
 
     public void saveSudoku() {
