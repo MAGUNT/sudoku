@@ -4,4 +4,7 @@
     <string name="not_solvable">This sudoku can\'t be solved.</string>
     <string name="start">Start</string>
     <string name="listado">Listar sudokus</string>
+    <string name="Identity">Id</string>
+    <string name="SudokuMoves">Moves</string>
+    <string name="SudokuTime">Time</string>
 </resources>
