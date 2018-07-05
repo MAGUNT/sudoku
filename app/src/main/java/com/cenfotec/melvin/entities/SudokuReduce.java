@@ -1,6 +1,8 @@
 package com.cenfotec.melvin.entities;
 
-import com.cenfotec.melvin.sudoku.Sudoku;
+import com.google.firebase.firestore.Exclude;
+
+import java.util.Locale;
 
 public class SudokuReduce {
 
@@ -8,12 +10,11 @@ public class SudokuReduce {
     private long moveCount;
     private String id;
 
+    @Exclude
+    private String formatTime;
 
-    public SudokuReduce() {
-        setTime(0);
-        setMoveCount(0);
-        setId(null);
-    }
+
+    public SudokuReduce() { }
 
     public long getTime() {
         return time;
@@ -21,6 +22,7 @@ public class SudokuReduce {
 
     public void setTime(long time) {
         this.time = time;
+        this.formatTime = calculateFormatedTime();
     }
 
     public long getMoveCount() {
@@ -37,5 +39,24 @@ public class SudokuReduce {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+
+    @Exclude
+    private String calculateFormatedTime() {
+        final long MILI_TO_SEC_FACTOR = 1000;
+        final long SEC_MIN_CYCLE      = 60;
+        long second = (time / MILI_TO_SEC_FACTOR) % SEC_MIN_CYCLE;
+        long minute = (time / (MILI_TO_SEC_FACTOR * SEC_MIN_CYCLE)) % SEC_MIN_CYCLE;
+        long hour   = time / (MILI_TO_SEC_FACTOR * SEC_MIN_CYCLE * SEC_MIN_CYCLE);
+
+       return String.format(Locale.US,
+               "%02d:%02d:%02d",
+               hour, minute, second);
+    }
+
+    @Exclude
+    public String getFormatTime() {
+        return formatTime;
     }
 }

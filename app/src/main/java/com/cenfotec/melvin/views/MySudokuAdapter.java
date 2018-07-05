@@ -10,17 +10,27 @@ import android.view.ViewGroup;
 import com.cenfotec.melvin.bll.SudokuBoard;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 public class MySudokuAdapter extends RecyclerView.Adapter<MySudokuAdapter.ViewHolder> {
 
     private final SudokuBoard sudokuBoard;
     private final RecyclerView.LayoutManager gridLayoutManager;
+    private final IntConsumer moveListener;
+
+    public MySudokuAdapter(SudokuBoard sudokuBoard,
+                           RecyclerView.LayoutManager gridLayoutManager,
+                           IntConsumer moveListener) {
+
+        this.sudokuBoard       = sudokuBoard;
+        this.gridLayoutManager = gridLayoutManager;
+        this.moveListener      = moveListener;
+    }
 
     public MySudokuAdapter(SudokuBoard sudokuBoard,
                            RecyclerView.LayoutManager gridLayoutManager) {
-
-        this.sudokuBoard = sudokuBoard;
-        this.gridLayoutManager = gridLayoutManager;
+        this(sudokuBoard, gridLayoutManager, i -> {});
     }
 
     @Override
@@ -77,18 +87,22 @@ public class MySudokuAdapter extends RecyclerView.Adapter<MySudokuAdapter.ViewHo
 
         @Override
         public void afterTextChanged(Editable editable) {
-            String text = editable.toString();
+            String text         = editable.toString();
             SudokuBox sudokuBox = getSudokuBox(position);
             if(sudokuBox == null
-                    || sudokuBoard.getValue(position).equals(text)) {
+                    || sudokuBoard
+                    .getValue(position)
+                    .equals(text)) {
                 return;
             }
-            List<Integer> invalid = sudokuBoard
-                    .add(position, text);
+
+            List<Integer> invalid = sudokuBoard.add(position, text);
+            moveListener.accept(position);
             if(!text.equals("0")
                     && invalid.isEmpty()) {
                 return;
             }
+
             sudokuBox.getText().clear();
             animateInvalidSudokuCells(invalid);
         }

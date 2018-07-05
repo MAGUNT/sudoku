@@ -20,8 +20,10 @@
         </activity>
         <activity
             android:name=".Sudoku"
+            android:parentActivityName=".SudokuList" />
+        <activity
+            android:name=".SudokuList"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".SudokuList"></activity>
     </application>
 
 </manifest>

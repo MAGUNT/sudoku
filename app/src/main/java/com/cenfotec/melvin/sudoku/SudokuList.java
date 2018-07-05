@@ -7,6 +7,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import com.cenfotec.melvin.bll.SudokuBoard;
 import com.cenfotec.melvin.dal.SudokuRepo;
@@ -25,15 +26,19 @@ public class SudokuList extends AppCompatActivity {
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private List<SudokuReduce> sudokuList;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sudoku_list);
 
+        progressBar = findViewById(R.id.processBar2);
+        progressBar.setVisibility(View.VISIBLE);
 
         mRecyclerView = findViewById(R.id.sudokuRecyclerView);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setVisibility(View.INVISIBLE);
 
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -53,6 +58,8 @@ public class SudokuList extends AppCompatActivity {
         this.sudokuList = list;
         mAdapter = new ListSudokuAdapter(list, this::onClickAdapterListener);
         mRecyclerView.setAdapter(mAdapter);
+        progressBar.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
     }
 
     private void onClickAdapterListener(View view) {

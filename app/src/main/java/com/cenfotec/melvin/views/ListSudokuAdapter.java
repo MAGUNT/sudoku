@@ -50,9 +50,10 @@ public class ListSudokuAdapter extends RecyclerView.Adapter<ListSudokuAdapter.Vi
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        holder.id.setText(mDataset.get(position).getId());
-        holder.moves.setText(Long.toString(mDataset.get(position).getMoveCount()));
-        holder.time.setText(Long.toString(mDataset.get(position).getTime()));
+        SudokuReduce sudokuReduce = mDataset.get(position);
+        holder.id.setText(sudokuReduce.getId());
+        holder.moves.setText(Long.toString(sudokuReduce.getMoveCount()));
+        holder.time.setText(sudokuReduce.getFormatTime());
 
     }
 

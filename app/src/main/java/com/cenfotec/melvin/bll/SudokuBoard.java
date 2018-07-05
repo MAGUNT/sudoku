@@ -19,23 +19,21 @@ public class SudokuBoard {
 
     private final List<SudokuCellEntity> board;
     private final SudokuRules rules;
-    private long moveCount;
 
-    public static SudokuBoard createBoard(@NonNull final List<SudokuCellEntity> board, final long moveCount) {
+    public static SudokuBoard createBoard(@NonNull final List<SudokuCellEntity> board) {
         SudokuRules rules = NormalSudokuRules.INSTANCE;
-        return new SudokuBoard(board, rules, moveCount);
+        return new SudokuBoard(board, rules);
     }
 
-    private SudokuBoard(@NonNull final List<SudokuCellEntity> board, final SudokuRules rules, final long moveCount) {
+    private SudokuBoard(@NonNull final List<SudokuCellEntity> board, @NonNull final SudokuRules rules) {
         if(board.size() !=  rules.squaresSize()) {
             throw new IllegalArgumentException();
         }
         this.rules = rules;
         this.board = board;
-        this.moveCount = moveCount;
     }
 
-    private List<SudokuDigits> createBoard(final SudokuRules util) {
+    private List<SudokuDigits> createBoard(@NonNull final SudokuRules util) {
        return Stream.iterate(SudokuDigits.EMPTY, s -> s)
                 .limit(rules.squaresSize())
                 .collect(Collectors.toList());
@@ -48,7 +46,6 @@ public class SudokuBoard {
         if(cell.isEnable() &&  list.isEmpty()) {
             board.get(position).setDigitEnum(digit);
         }
-        ++moveCount;
         return list;
     }
 
@@ -92,8 +89,5 @@ public class SudokuBoard {
         return board;
     }
 
-    public long getMoveCount() {
-        return moveCount;
-    }
 
 }

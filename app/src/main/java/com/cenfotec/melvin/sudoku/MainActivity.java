@@ -10,6 +10,7 @@ import android.widget.ProgressBar;
 
 
 import com.cenfotec.melvin.bll.SudokuManager;
+import com.cenfotec.melvin.entities.SudokuEntity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -36,12 +37,17 @@ public class MainActivity extends AppCompatActivity {
         this.generate.setEnabled(false);
         this.listar.setEnabled(false);
         SudokuManager.createSudoku()
-                .addOnSuccessListener(this, sudoku -> {
-                    Intent intent = new Intent(this, Sudoku.class);
-                    intent.putExtra(SUDOKU, sudoku.getId());
-                    this.progressBar.setVisibility(View.INVISIBLE);
-                    this.startActivity(intent);
-                });
+                .addOnSuccessListener(this,
+                        this::onSuccess);
+    }
+
+    public void onSuccess(SudokuEntity sudoku) {
+        Intent intent = new Intent(this, Sudoku.class);
+        intent.putExtra(SUDOKU, sudoku.getId());
+        progressBar.setVisibility(View.INVISIBLE);
+        generate.setEnabled(true);
+        listar.setEnabled(true);
+        startActivity(intent);
     }
 
     public void toSudokuList(View view) {
